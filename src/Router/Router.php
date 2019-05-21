@@ -8,8 +8,17 @@
     protected $http_method;
     protected $baseSrcPath='';
     protected $mainDirectory = '/';
+    protected $_instance = null;
 
-    function __construct()    {
+    function __construct() {
+      $this->init();
+    }
+    
+    /**
+     * initialize a some params of this Router
+     */
+    protected function init()
+    {
       $this->http_method = $_SERVER['REQUEST_METHOD'];
     }
 
@@ -17,6 +26,7 @@
      * change a current directory where we load a classes 
      * used as a callback on method to send a response (get, post ..)
      * @param {String} $path the new path to direcroy source
+     * @return Router instance
      */
     public function setBaseSrcPath(String $path = '')
     {
@@ -24,19 +34,40 @@
       return $this;
     }
 
-    public function setMainDirectory(String $directory = '/')
-    {
+    /**
+     * config a main directory where will look to import classes
+     * @param {String} $directory the path to new main directory
+     * @return Router instance
+     */
+    public function setMainDirectory(string $directory = '/') {
       $this->mainDirectory = $directory;
+      return $this;
     }
     
+    /** 
+     * handle all GET request
+     * @param {String} $path the path hitted by user
+     * @param {Mixed} $callback the callback called to handle request
+     * @throw an error if this function called outside of GET request
+     */
+    public function get (string $path, $callback): void {
+      if( $this->http_method === 'GET' ) {
+        $this->map($path, $callback);
+      } else throw new Exception("You can call this function if the Request method is not a GET request");
+    }
 
-    public function get ($path, $callback) {
+    /**
+     * this is a process to handlling a user request
+     * @param {String} $path the path hitted by user
+     * @param {Mixed} $callback the callback called to handle request
+     * @return null
+     */
+    protected function map ($path, $callback): void {
       $class = '';
       $method = '';
       //var_dump("{$_SERVER['REQUEST_URI']}", "{$this->mainDirectory}{$path}");
       //var_dump(gettype($callback));
       if(
-        $this->http_method === 'GET' AND
         in_array(
           $_SERVER['REQUEST_URI'], 
           [
@@ -44,7 +75,7 @@
             "{$this->mainDirectory}{$path}/"
           ]
         )
-      ) {
+       ) {
         switch ( gettype($callback) ) {
           case 'string':
             $pointPosition = strpos($callback, '.');
@@ -67,9 +98,6 @@
         return;
       }
     }
-
-
-
 
   }
   
