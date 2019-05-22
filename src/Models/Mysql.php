@@ -67,5 +67,37 @@
               : $query->fetch();
     }
     
+    /**
+     * retrieve all $fields data from $table 
+     * is a short cut of SELECT query in SQL 
+     * without write a whole query in SQL
+     * @param {Array} $fields list of fields data to retrieve
+     * @param {String} $table the naùe of table on DB
+     * @param {Boolean} $fetchAll check if to fetch all data or get one row
+     * @param {Array} $options contain some options 
+     * like where clause on SQL query and there 3 values
+     * the first is 'whereFields' array of fields to add on where clause
+     * the 2nd 'whereFieldsValues' array of fields values (is a values of whereFields)
+     * the 3th 'operation' list (AND, OR)
+     */
+    public function find(array $fields, string $table, bool $fetchAll=TRUE, array $options=[]): array  {
+
+      $fieldsjoin = implode(', ', $fields);
+      $fieldsWhereJoin = '';
+      $sql = "SELECT $fieldsjoin FROM $table";
+
+      if(count($options)) {
+        $fieldsWhereJoin = implode(" =? {$options['operation']} ", $options['whereFields']);
+        $fieldsWhereJoin .= " =? ";
+        $sql .= " WHERE $fieldsWhereJoin "; 
+      }
+
+      $sth = $this->getPdo()->prepare($sql);
+      $sth->execute($options['whereFieldsValues']);
+
+      return $fetchAll 
+              ? $sth->fetchAll() 
+              : $sth->fetch();
+    }
     
   }
