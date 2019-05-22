@@ -59,17 +59,21 @@
      * @return {Mixed} List if there is data to get or associate Array or 
      * false in case there not data to retrieve  
      */
-    public function query(string $sql, $fetchAll=true, array $options=[]): array {
+    public function query(string $sql, $fetchAll=true, array $options=[]) {
       
       $sth = $this
                 ->getPdo()
                 ->prepare($sql);
 
-      $sth->execute( count($options)? $options['whereFieldsValues'] : []);
+      $values = count($options)? $options['whereFieldsValues'] : [];
+      $exec = $sth->execute($values);
 
-      return $fetchAll
-              ? $sth->fetchAll() 
-              : $sth->fetch();
+      if( preg_match("#^SELECT.+$#i", $sql) )
+        return $fetchAll
+                ? $sth->fetchAll() 
+                : $sth->fetch();
+      else if( preg_match("#^INSERT.+$#i", $sql) )
+        return $exec;
     }
     
     /**
@@ -103,6 +107,31 @@
       //using query function
       $whereFieldsValues = isset($options['whereFieldsValues'])? $options['whereFieldsValues'] : [];
       return $this->query($sql, $fetchAll, [ 'whereFieldsValues' => $whereFieldsValues ]);
+    }
+
+    /**
+     * insert data $values of $fields into table $table
+     * @param {String} $table name of table where insert data
+     * @param {Array} $fields list of fields to insert
+     * @param {Array} $values list of values of $fields to insert
+     * @return {Bool} true if inserted otherwise false 
+     */
+    public function insert($table, $fields, $values){
+    
+      $sql = 'INSERT INTO ' . htmlentities($table) . ' ';
+      $sql .=  '( ' . implode($fields, ', ') . ' )';
+      $sql .= ' VALUES ( ';
+      foreach ($fields as $key => $value) {
+        $sql .= '?';
+        if(($key+1) < count($fields)) $sql .= ', ';  
+      }
+      $sql .= ' )';
+      $res = $this->query($sql, true, [
+        'whereFieldsValues' => $values
+      ]);
+
+      return $res;
+      
     }
     
   }
