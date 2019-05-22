@@ -55,16 +55,21 @@
      * query DB by $sql request and retrieve all/one data
      * @param {String} $sql the sql request support MySQL sql
      * @param {Boolean} $fetchAll get all data or one depend on true or false
+     * @param {Array} list of options like where fields values use when prepare a query
      * @return {Mixed} List if there is data to get or associate Array or 
      * false in case there not data to retrieve  
      */
-    public function query(string $sql, $fetchAll=true): array {
-      $query = $this
+    public function query(string $sql, $fetchAll=true, array $options=[]): array {
+      
+      $sth = $this
                 ->getPdo()
-                ->query($sql);
+                ->prepare($sql);
+
+      $sth->execute(count($options)? $options['whereFieldsValues'] : []);
+
       return $fetchAll
-              ? $query->fetchAll() 
-              : $query->fetch();
+              ? $sth->fetchAll() 
+              : $sth->fetch();
     }
     
     /**
