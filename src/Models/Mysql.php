@@ -65,7 +65,7 @@
                 ->getPdo()
                 ->prepare($sql);
 
-      $sth->execute(count($options)? $options['whereFieldsValues'] : []);
+      $sth->execute( count($options)? $options['whereFieldsValues'] : []);
 
       return $fetchAll
               ? $sth->fetchAll() 
@@ -92,17 +92,17 @@
       $sql = "SELECT $fieldsjoin FROM $table";
 
       if(count($options)) {
-        $fieldsWhereJoin = implode(" =? {$options['operation']} ", $options['whereFields']);
+        $operation = isset($options['operation'])? $options['operation'] : '';
+        $fieldsWhereJoin = implode(" =? {$operation} ", $options['whereFields']);
         $fieldsWhereJoin .= " =? ";
         $sql .= " WHERE $fieldsWhereJoin "; 
       }
-
-      $sth = $this->getPdo()->prepare($sql);
-      $sth->execute($options['whereFieldsValues']);
-
-      return $fetchAll 
-              ? $sth->fetchAll() 
-              : $sth->fetch();
+      // old process
+      //$sth = $this->getPdo()->prepare($sql);
+      //$sth->execute($options['whereFieldsValues']);
+      //using query function
+      $whereFieldsValues = isset($options['whereFieldsValues'])? $options['whereFieldsValues'] : [];
+      return $this->query($sql, $fetchAll, [ 'whereFieldsValues' => $whereFieldsValues ]);
     }
     
   }
