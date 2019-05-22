@@ -67,6 +67,28 @@
       $method = '';
       //var_dump("{$_SERVER['REQUEST_URI']}", "{$this->mainDirectory}{$path}");
       //var_dump(gettype($callback));
+      if( $path === '/*' OR $path === '*' ) {
+        switch ( gettype($callback) ) {
+          case 'string':
+            $pointPosition = strpos($callback, '.');
+            if( $pointPosition ) {  
+              $class = substr($callback, 0, $pointPosition);
+              $method = substr($callback,$pointPosition+1);
+              require "{$this->baseSrcPath}/$class.php";
+              $class = substr($class, strpos($class, '/')+1);
+              $reflection = new \ReflectionMethod($class, $method);
+              $reflection->invoke(new $class());
+            } else {
+              call_user_func($callback);
+            }
+            return;
+          case 'object': $callback();return;
+          default:
+            echo 'not a string func';
+            break;
+        }
+        return;
+      }
       if(
         in_array(
           $_SERVER['REQUEST_URI'], 
