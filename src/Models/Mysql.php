@@ -33,7 +33,6 @@
      * @return PDO
      */
     protected function getPdo(): PDO {
-      var_dump($this->_dbInstance);
       return $this->_dbInstance;
     }
 
@@ -52,7 +51,14 @@
         }
     }
 
-    public function select(string $sql, $fetchAll=true) {
+    /**
+     * query DB by $sql request and retrieve all/one data
+     * @param {String} $sql the sql request support MySQL sql
+     * @param {Boolean} $fetchAll get all data or one depend on true or false
+     * @return {Mixed} List if there is data to get or associate Array or 
+     * false in case there not data to retrieve  
+     */
+    public function query(string $sql, $fetchAll=true): array {
       $query = $this
                 ->getPdo()
                 ->query($sql);
