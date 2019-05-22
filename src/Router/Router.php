@@ -17,7 +17,7 @@
     /**
      * initialize a some params of this Router
      */
-    protected function init()
+    protected function init(): void
     {
       $this->http_method = $_SERVER['REQUEST_METHOD'];
     }
@@ -28,7 +28,7 @@
      * @param {String} $path the new path to direcroy source
      * @return Router instance
      */
-    public function setBaseSrcPath(String $path = '')
+    public function setBaseSrcPath(String $path = ''): Router
     {
       $this->baseSrcPath = $path;
       return $this;
@@ -39,7 +39,7 @@
      * @param {String} $directory the path to new main directory
      * @return Router instance
      */
-    public function setMainDirectory(string $directory = '/') {
+    public function setMainDirectory(string $directory = '/'): Router {
       $this->mainDirectory = $directory;
       return $this;
     }
