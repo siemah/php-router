@@ -74,6 +74,8 @@
                 : $sth->fetch();
       else if( preg_match("#^INSERT.+$#i", $sql) )
         return $exec;
+      else if( preg_match("#^UPDATE.+$#i", $sql) )
+        return $exec;
     }
     
     /**
@@ -129,6 +131,44 @@
       $res = $this->query($sql, true, [
         'whereFieldsValues' => $values
       ]);
+
+      return $res;
+      
+    }
+
+    /**
+     * insert data $values of $fields into table $table
+     * @param {String} $table name of table where insert data
+     * @param {Array} $fields list of fields to insert
+     * @param {Array} $values list of values of $fields to insert
+     * @return {Bool} true if inserted otherwise false 
+     */
+    public function update(string $table, array $fields, array $values, array $options=[]) {
+      if( count($fields) === 0 OR count($values) === 0 ) 
+        throw new Exception('Fields and/or values array is empty, you can\'t update this table because there is not field to update');
+      else if( strlen(trim($table)) === 0 )
+        throw new Exception('Table name must not to be an empty string');
+      // construct a main sql query
+      $sql = 'UPDATE ' . htmlentities($table) . ' SET ';
+      foreach ($fields as $key => $value) {
+        $sql .= htmlentities($value) . '=?';
+        if(($key+1) < count($fields)) $sql .= ', ';  
+      }
+      // handle a where queries
+      if( count($options) AND isset($options['whereFields'], $options['whereValues']) ) {
+        if( count($options['whereValues']) !== count($options['whereFields']) )
+          throw new Exception('Where fields array must contain the same length than where values array');
+        $sql .= " WHERE ";
+        foreach ($options['whereFields'] as $key => $value) {
+          $sql .= htmlentities($value) . '=? ';
+          if(($key+1) < count($fields) AND isset($options['operation']) AND count($options['whereFields']) > 1) 
+            $sql .= $options['operation'] . " ";  
+        }
+        $values = array_merge($values, $options['whereValues']);
+      }
+      //var_dump($sql, $values);die;
+
+      $res = $this->query($sql, true, [ 'whereFieldsValues' => $values ]);
 
       return $res;
       
