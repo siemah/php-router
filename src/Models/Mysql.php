@@ -56,10 +56,10 @@
      * @param {String} $sql the sql request support MySQL sql
      * @param {Boolean} $fetchAll get all data or one depend on true or false
      * @param {Array} list of options like where fields values use when prepare a query
-     * @return {Mixed} List if there is data to get or associate Array or 
+     * @return {Array} List if there is data to get or associate Array or 
      * false in case there not data to retrieve  
      */
-    public function query(string $sql, $fetchAll=true, array $options=[]) {
+    public function query(string $sql, $fetchAll=true, array $options=[]): array {
       
       $sth = $this
                 ->getPdo()
@@ -72,9 +72,7 @@
         return $fetchAll
                 ? $sth->fetchAll() 
                 : $sth->fetch();
-      else if( preg_match("#^INSERT.+$#i", $sql) )
-        return $exec;
-      else if( preg_match("#^UPDATE.+$#i", $sql) )
+      else
         return [
           'rowAffected' => $sth->rowCount(),
           'isUpdated' => $exec
