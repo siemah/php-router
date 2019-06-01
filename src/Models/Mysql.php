@@ -75,7 +75,10 @@
       else if( preg_match("#^INSERT.+$#i", $sql) )
         return $exec;
       else if( preg_match("#^UPDATE.+$#i", $sql) )
-        return $exec;
+        return [
+          'rowAffected' => $sth->rowCount(),
+          'isUpdated' => $exec
+        ];
     }
     
     /**
