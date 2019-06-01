@@ -140,11 +140,13 @@
     }
 
     /**
-     * insert data $values of $fields into table $table
-     * @param {String} $table name of table where insert data
-     * @param {Array} $fields list of fields to insert
-     * @param {Array} $values list of values of $fields to insert
-     * @return {Bool} true if inserted otherwise false 
+     * update fields $fields on table $table 
+     * @param {String} $table name of table to update
+     * @param {Array} $fields list of fields to update
+     * @param {Array} $values list of values of $fields to update
+     * @param {Array} $options some options like where clause 
+     * @return {Array} return an array of 
+     *      ['rowAffected' => list of rows updated, 'isUpdated' => update or not(true/false)]
      */
     public function update(string $table, array $fields, array $values, array $options=[]) {
       if( count($fields) === 0 OR count($values) === 0 ) 
