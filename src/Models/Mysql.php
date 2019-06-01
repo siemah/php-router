@@ -1,5 +1,9 @@
 <?php
 
+  /**
+   * @name Mysql
+   * simplify some query in functions
+   */
   class Mysql {
 
     protected $host='localhost';
@@ -119,7 +123,7 @@
      * @param {Array} $values list of values of $fields to insert
      * @return {Bool} true if inserted otherwise false 
      */
-    public function insert($table, $fields, $values){
+    public function insert($table, $fields, $values): array{
     
       $sql = 'INSERT INTO ' . htmlentities($table) . ' ';
       $sql .=  '( ' . implode($fields, ', ') . ' )';
@@ -146,7 +150,7 @@
      * @return {Array} return an array of 
      *      ['rowAffected' => list of rows updated, 'isUpdated' => update or not(true/false)]
      */
-    public function update(string $table, array $fields, array $values, array $options=[]) {
+    public function update(string $table, array $fields, array $values, array $options=[]): array {
       if( count($fields) === 0 OR count($values) === 0 ) 
         throw new Exception('Fields and/or values array is empty, you can\'t update this table because there is not field to update');
       else if( strlen(trim($table)) === 0 )
